@@ -53,5 +53,3 @@ void print_rgb(colorData rgb)
   Serial.print(rgb.value[TCS230_RGB_B]);
   Serial.println();
 }
-  
-}
