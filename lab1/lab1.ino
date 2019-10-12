@@ -60,11 +60,11 @@ void loop()
     colorSensor->getRGB(&rgb);
     print_rgb(rgb);
     delete colorSensor;
-    int index = getIndex(rgb);
-    buzzer.playNote(index);
+    int color = getColor(rgb);
+    buzzer.playNote(color);
 }
 
-int getIndex(colorData rgb){
+int getColor(colorData rgb){
   int r = rgb.value[TCS230_RGB_R];
   int g = rgb.value[TCS230_RGB_G];
   int b = rgb.value[TCS230_RGB_B];
