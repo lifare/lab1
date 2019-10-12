@@ -7,19 +7,22 @@
 #define  S1_OUT  3
 #define  S2_OUT  4
 #define  S3_OUT  5
-#define PIN_BUZZER 6
-#define white 10
-#define red 11
-#define green 12
-#define blue 13
-#define rb 14
-#define rg 15
-#define gb 16
-#define black 17
-#define unknow 18
+#define PIN_BUZZER_1 6
+#define PIN_BUZZER_2 7
+enum {
+  white = 0,
+  red = 1,
+  green = 2,
+  blue = 3,
+  red_and_blue = 4,
+  red_and_green = 5,
+  green_and_blue = 6,
+  black = 7,
+  unknow = 8
+};
 
-MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
-Buzzer buzzer(PIN_BUZZER);
+MD_TCS230 *colorSensor;
+Buzzer buzzer(PIN_BUZZER_1,PIN_BUZZER_2);
 int notes[] = {NOTE_C1, NOTE_C2, NOTE_C3, NOTE_C4, NOTE_C5, NOTE_C6, NOTE_C7, NOTE_C8, NOTE_D8};
 double durations[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 int melodyLength = 9;
@@ -30,18 +33,19 @@ void setup()
     Serial.println("Started!");
 
     sensorData whiteCalibration;
-    whiteCalibration.value[TCS230_RGB_R] = 0;
-    whiteCalibration.value[TCS230_RGB_G] = 0;
-    whiteCalibration.value[TCS230_RGB_B] = 0;
-
+    whiteCalibration.value[TCS230_RGB_R] = 131610;
+    whiteCalibration.value[TCS230_RGB_G] = 106380;
+    whiteCalibration.value[TCS230_RGB_B] = 144050;
+    
     sensorData blackCalibration;
-    blackCalibration.value[TCS230_RGB_R] = 0;
-    blackCalibration.value[TCS230_RGB_G] = 0;
-    blackCalibration.value[TCS230_RGB_B] = 0;
+    blackCalibration.value[TCS230_RGB_R] = 14330;
+    blackCalibration.value[TCS230_RGB_G] = 11500;
+    blackCalibration.value[TCS230_RGB_B] = 15710;
 
-    colorSensor.begin();
-    colorSensor.setDarkCal(&blackCalibration);
-    colorSensor.setWhiteCal(&whiteCalibration);
+
+    colorSensor->begin();
+    colorSensor->setDarkCal(&blackCalibration);
+    colorSensor->setWhiteCal(&whiteCalibration);
     
     buzzer.setMelody(notes, durations, melodyLength);
     buzzer.turnSoundOn();
@@ -49,38 +53,41 @@ void setup()
 
 void loop() 
 {
+    colorSensor = new MD_TCS230(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
     colorData rgb;
-    colorSensor.read();
-    while (!colorSensor.available());
-    colorSensor.getRGB(&rgb);
+    colorSensor->read();
+    while (!colorSensor->available());
+    colorSensor->getRGB(&rgb);
     print_rgb(rgb);
+    delete colorSensor;
     int index = getIndex(rgb);
     buzzer.playNote(index);
 }
 
-int getIndex(color Data rgb){
+int getIndex(colorData rgb){
   int r = rgb.value[TCS230_RGB_R];
   int g = rgb.value[TCS230_RGB_G];
   int b = rgb.value[TCS230_RGB_B];
   int dif = 10;
-  dominante_color = max(max(r,g),b);
+  int dominante_color = max(max(r,g),b);
+  bool check_black = 255 - dominante_color < 30 && dominante_color - r < 15 && dominante_color - g < 15 && dominante_color - b < 15;
   if (dominante_color < 10)
     return white - dif;
-  if (255 - dominante_color < 30 && dominante_color - r < 15 && dominante_color - g < 15 && dominante_color - b < 15)
-    return black - dif;
+  if (check_black)
+    return black;
   if (dominante_color - r < 15 && dominante_color - g < 15)
-    return rg - dif;
+    return red_and_green;
   if (dominante_color - r < 15 && dominante_color - b < 15)
-    return rb - dif;
+    return red_and_blue;
   if (dominante_color - b < 15 && dominante_color - g < 15)
-    return bg - dif;
+    return green_and_blue;
   if (dominante_color == r)
-    return red - dif;
+    return red;
   if (dominante_color == g)
-    return green - dif;
+    return green;
   if (dominante_color == b)
-    return blue - dif;
-  return unknow - dif;
+    return blue;
+  return unknow;
 }
 
 void print_rgb(colorData rgb)
