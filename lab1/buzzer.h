@@ -61,6 +61,23 @@ public:
         }
     }
 
+    void playNote(int index)
+    {
+      if (!isEnabled)
+        return;
+      unsigned long duration = round(BUZZER_NOTE_DURATION*durations[currentNote]);
+      currentNote = index
+      int note = notes[currentNote];
+      if (note == NOTE_SILENCE)
+        noTone(pin);
+      else 
+        tone(pin, notes[currentNote]);
+      noteStartedMs = millis();
+      while(millis()- noteStartedMs < duration){
+      }
+      noTone(pin);
+    }
+
 private:
     int pin;
     bool isEnabled;

@@ -8,9 +8,22 @@
 #define  S2_OUT  4
 #define  S3_OUT  5
 #define PIN_BUZZER 6
+#define white 10
+#define red 11
+#define green 12
+#define blue 13
+#define rb 14
+#define rg 15
+#define gb 16
+#define black 17
+#define unknow 18
 
+MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
 Buzzer buzzer(PIN_BUZZER);
-//notes
+int notes[] = {NOTE_B0, NOTE_A1, NOTE_G2, NOTE_F3, NOTE_E4, NOTE_D5, NOTE_B6, NOTE_C7, NOTE_D8};
+double durations[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+int melodyLength = 9;
+
 void setup()
 {
     Serial.begin(115200);
@@ -29,19 +42,45 @@ void setup()
     colorSensor.begin();
     colorSensor.setDarkCal(&blackCalibration);
     colorSensor.setWhiteCal(&whiteCalibration);
-//buzzer setup
+    
+    buzzer.setMelody(notes, durations, melodyLength);
+    buzzer.turnSoundOn();
 }
 
 void loop() 
 {
     colorData rgb;
     colorSensor.read();
-
     while (!colorSensor.available());
-
     colorSensor.getRGB(&rgb);
     print_rgb(rgb);
-//play melody
+    int index = getIndex(rgb);
+    buzzer.playNote(index);
+}
+
+int getIndex(color Data rgb){
+  int r = rgb.value[TCS230_RGB_R];
+  int g = rgb.value[TCS230_RGB_G];
+  int b = rgb.value[TCS230_RGB_B];
+  int dif = 10;
+  dominante_color = max(max(r,g),b);
+  if (dominante_color < 10)
+    return white - dif;
+  if (255 - dominante_color < 30 && dominante_color - r < 15 && dominante_color - g < 15 && dominante_color - b < 15)
+    return black - dif;
+  if (dominante_color - r < 15 && dominante_color - g < 15)
+    return rg - dif;
+  if (dominante_color - r < 15 && dominante_color - b < 15)
+    return rb - dif;
+  if (dominante_color - b < 15 && dominante_color - g < 15)
+    return bg - dif;
+  if (dominante_color == r)
+    return red - dif;
+  if (dominante_color == g)
+    return green - dif;
+  if (dominante_color == b)
+    return blue - dif;
+  return unknow - dif;
 }
 
 void print_rgb(colorData rgb)
