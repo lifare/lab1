@@ -20,7 +20,7 @@
 
 MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
 Buzzer buzzer(PIN_BUZZER);
-int notes[] = {NOTE_B0, NOTE_A1, NOTE_G2, NOTE_F3, NOTE_E4, NOTE_D5, NOTE_B6, NOTE_C7, NOTE_D8};
+int notes[] = {NOTE_C1, NOTE_C2, NOTE_C3, NOTE_C4, NOTE_C5, NOTE_C6, NOTE_C7, NOTE_C8, NOTE_D8};
 double durations[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 int melodyLength = 9;
 
