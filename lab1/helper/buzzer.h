@@ -1,7 +1,6 @@
 #include <toneAC2.h>
-
+#include "pitches.h"
 #pragma once
-
 #define BUZZER_NOTE_DURATION 100
 
 class Buzzer
@@ -71,13 +70,14 @@ public:
       unsigned long duration = round(BUZZER_NOTE_DURATION*durations[currentNote]);
       currentNote = index;
       int note = notes[currentNote];
-      if (note == NOTE_SILENCE)
-        noToneAC2();
-      else 
-        toneAC2(pin1,pin2, notes[currentNote]);
-      noteStartedMs = millis();
-      while(millis()- noteStartedMs < duration){
+      if (note != NOTE_SILENCE){
+        toneAC2(pin1,pin2, note);
+        noteStartedMs = millis();
+        while(millis()- noteStartedMs < duration){
+        }
       }
+      else
+        noToneAC2();
       noToneAC2();
     }
 
