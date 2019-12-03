@@ -1,29 +1,17 @@
 #include <Arduino.h>
 #include <MD_TCS230.h>
 #include "Wire.h"
+#include "./helper/Colors.h"
 
 #define  S0_OUT  2
 #define  S1_OUT  3
 #define  S2_OUT  4
 #define  S3_OUT  5
 
-enum {
-  white = 0,
-  red = 1,
-  green = 2,
-  blue = 3,
-  yellow = 4,
-  orange = 5,
-  purple = 6,
-  black = 7,
-  unknow = 8,
-  none = 9
-};
-
 MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
 
 const int address = 10;
-int currentColor = none;
+int currentColor = unknow;
 
 void setup()
 {

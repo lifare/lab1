@@ -1,36 +1,27 @@
 #include <Arduino.h>
 #include "Wire.h"
-#include "buzzer.h"
 #include "pitches.h"
+#include "Colors.h"
+#include <toneAC2.h>
 
 #define PIN_BUZZER_1 6
 #define PIN_BUZZER_2 7
+#define BUZZER_NOTE_DURATION 100
+unsigned long noteStartedMs;
 
-Buzzer buzzer(PIN_BUZZER_1,PIN_BUZZER_2);
-int notes[] = {NOTE_C1, NOTE_C2, NOTE_C3, NOTE_C4, NOTE_C5, NOTE_C6, NOTE_C7, NOTE_C8, NOTE_SILENCE, NOTE_SILENCE};
+int notes[] = {NOTE_A1, NOTE_B1, NOTE_C1, NOTE_D1, NOTE_E1, NOTE_F1, NOTE_G1, NOTE_GS1, NOTE_SILENCE};
 double durations[] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 int melodyLength = 9;
 
-enum {
-  white = 0,
-  red = 1,
-  green = 2,
-  blue = 3,
-  yellow = 4,
-  orange = 5,
-  purple = 6,
-  black = 7,
-  unknow = 8,
-  none = 9
-};
 
-int currentColor = none;
+int currentColor = unknow;
 const int colorAddr = 10;
 
 void setup()
 {    
-    buzzer.setMelody(notes, durations, melodyLength);
-    buzzer.turnSoundOn();
+    noteStartedMs = 0;
+    pinMode(PIN_BUZZER_1, OUTPUT);
+    pinMode(PIN_BUZZER_2, OUTPUT);
     Serial.begin(115200);
     Wire.begin();
 }
@@ -41,17 +32,27 @@ void loop()
     currentColor = readColor();
     Serial.print(currentColor);
     Serial.print("\n");
-    if (currentColor != none){
-      buzzer.playNote(currentColor);
-      delay(2000);
-    }
+    playNote(currentColor);
+    delay(2000);
 
 };
 
 int readColor()
 {
-  Wire.requestFrom(colorAddr, 1);
   if (Wire.available()) {
     return Wire.read();
   }
+}
+
+void playNote(int index)
+{
+  unsigned long duration = round(BUZZER_NOTE_DURATION*durations[index]);
+  int note = notes[index];
+  if (note != NOTE_SILENCE){
+    toneAC2(PIN_BUZZER_1,PIN_BUZZER_2, note);
+    noteStartedMs = millis();
+    while(millis()- noteStartedMs < duration){
+    }
+  }
+  noToneAC2();
 }
