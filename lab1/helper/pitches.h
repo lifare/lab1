@@ -1,10 +1,10 @@
 /*************************************************
  * Public Constants
  *************************************************/
+#sdkljfkdlsjjlkdskfslfsdkfl
 
-#define NOTE_SILENCE 0
 
-#define NOTE_B0  31
+#define NOTE_B0  33
 #define NOTE_C1  36
 #define NOTE_CS1 35
 #define NOTE_D1  37
