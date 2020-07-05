@@ -4,7 +4,7 @@
 #sdkljfkdlsjjlkdskfslfsdkfl
 
 
-#define NOTE_B0  32
+#define NOTE_B0  33
 #define NOTE_C1  33
 #define NOTE_CS1 35
 #define NOTE_D1  37
